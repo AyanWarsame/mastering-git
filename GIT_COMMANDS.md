@@ -1,487 +1,732 @@
-# Git Commands Reference - Practical Guide
+# Git Commands Reference - Comprehensive Practical Guide
 
-## 1. INITIAL SETUP
+## ── SETUP ──
 
 ### Configure Git
 ```bash
+# Set your name globally
 git config --global user.name "Your Name"
-git config --global user.email "your.email@example.com"
+
+# Set your email globally
+git config --global user.email "you@email.com"
+
+# Set VS Code as default editor
+git config --global core.editor "code --wait"
+
+# Set VS Code as merge tool
+git config --global merge.tool vscode
+
+# Default pull to rebase (recommended)
+git config --global pull.rebase true
+
+# Show all config settings
 git config --list
 ```
 
-### Initialize a Repository
+### Useful Aliases
 ```bash
-git init
-git clone <repository-url>
+# Quick status
+git config --global alias.st status
+
+# Quick checkout
+git config --global alias.co checkout
+
+# Quick branch listing
+git config --global alias.br branch
+
+# Quick commit
+git config --global alias.ci commit
+
+# Pretty log with graph
+git config --global alias.lg "log --oneline --graph --decorate"
 ```
 
 ---
 
-## 2. CHECKING STATUS & HISTORY
+## ── INIT & CLONE ──
 
-### Status
+### Initialize Repository
 ```bash
+# Initialise a new repo in current directory
+git init
+
+# Initialise a new repo in a new folder
+git init my-project
+
+# Clone a remote repo
+git clone https://github.com/user/repo.git
+
+# Clone into a specific folder
+git clone https://github.com/user/repo.git my-folder
+
+# Shallow clone (latest snapshot only)
+git clone --depth 1 https://github.com/user/repo.git
+
+# Clone and checkout a specific branch
+git clone --branch develop https://github.com/user/repo.git
+```
+
+---
+
+## ── STAGE & COMMIT ──
+
+### Check Status
+```bash
+# Show working tree status (detailed)
 git status
+
+# Show status in short format
 git status -s
 ```
 
-### View Commit History
-```bash
-git log
-git log --oneline
-git log --oneline -5
-git log --graph --oneline --all
-git log --author="AyanWarame"
-git show <commit-hash>
-```
-
-### Compare Changes
-```bash
-git diff
-git diff --staged
-git diff <branch1> <branch2>
-git diff HEAD~1
-```
-
----
-
-## 3. STAGING & COMMITTING
-
 ### Stage Files
 ```bash
-git add calc.py
+# Stage all changes in current directory
 git add .
-git add *.py
-git add -A
-```
 
-### Unstage Files
-```bash
-git restore --staged calc.py
-git reset HEAD calc.py
+# Stage a specific file
+git add calc.py
+
+# Stage changes interactively (hunk by hunk)
+git add -p
+
+# Stage all changes everywhere (-A = all)
+git add -A
 ```
 
 ### Commit
 ```bash
-git commit -m "Add multiply function"
-git commit -am "Update calculator"
-git commit --amend
+# Commit with a message
+git commit -m "feat: add login endpoint"
+
+# Edit the last commit message
+git commit --amend -m "corrected message"
+
+# Add staged changes to last commit, keep message
 git commit --amend --no-edit
+
+# Create a fixup commit for the previous commit
+git commit --fixup HEAD~1
 ```
 
-### Discard Changes
+### Unstage & Discard
 ```bash
-git restore calc.py
-git checkout -- calc.py
+# Unstage a specific file (keep changes)
+git reset HEAD src/app.js
+
+# Discard changes in working tree for a file
+git checkout -- src/app.js
+
+# Restore file to last commit state (modern syntax)
+git restore src/app.js
+
+# Unstage a file (modern syntax)
+git restore --staged src/app.js
+
+# Delete all untracked files and directories
 git clean -fd
 ```
 
+### View Changes
+```bash
+# Show unstaged changes
+git diff
+
+# Show staged changes (about to be committed)
+git diff --staged
+
+# Show changes between last two commits
+git diff HEAD~1 HEAD
+
+# Compare two branches
+git diff main..develop
+```
+
 ---
 
-## 4. BRANCHING
+## ── BRANCHES ──
 
 ### List Branches
 ```bash
+# List local branches
 git branch
+
+# List all branches (local + remote)
 git branch -a
+
+# List remote branches only
+git branch -r
+
+# List branches with details
 git branch -v
 ```
 
-### Create Branch
+### Create & Switch
 ```bash
-git branch feature/multiply
-git checkout -b feature/multiply
-git switch -c feature/multiply
+# Create a new branch (stay on current)
+git branch feature/login
+
+# Create and switch to a new branch
+git checkout -b feature/login
+
+# Create and switch (modern syntax)
+git switch -c feature/login
+
+# Switch to an existing branch
+git checkout develop
+
+# Switch branch (modern syntax)
+git switch develop
+
+# Track a remote branch locally
+git checkout -b feature/login origin/feature/login
 ```
 
-### Switch Branch
+### Rename & Delete
 ```bash
-git checkout main
-git checkout feature/multiply
-git switch main
-git switch feature/multiply
-```
-
-### Delete Branch
-```bash
-git branch -d feature/multiply
-git branch -D feature/multiply
-git push origin --delete feature/multiply
-```
-
-### Rename Branch
-```bash
+# Rename a branch
 git branch -m old-name new-name
-git branch -m feature/multiply feature/multiplication
+
+# Delete a merged branch (safe)
+git branch -d feature/login
+
+# Force delete a branch (even if unmerged)
+git branch -D feature/login
+
+# Delete a remote branch
+git push origin --delete feature/login
 ```
 
 ---
 
-## 5. MERGING
-
-### Merge Branch
-```bash
-git checkout main
-git merge feature/multiply
-```
-
-### Merge Abort
-```bash
-git merge --abort
-```
-
-### View Merge Base
-```bash
-git merge-base main feature/multiply
-```
-
----
-
-## 6. REBASING
-
-### Rebase Branch
-```bash
-git checkout feature/divide
-git rebase main
-git rebase main feature/divide
-```
-
-### Interactive Rebase
-```bash
-git rebase -i HEAD~3
-git rebase -i main
-```
-
-### Rebase Abort
-```bash
-git rebase --abort
-```
-
-### Rebase Continue
-```bash
-git rebase --continue
-```
-
----
-
-## 7. STASHING
-
-### Stash Changes
-```bash
-git stash
-git stash save "Work in progress on multiply"
-```
-
-### List Stashes
-```bash
-git stash list
-```
-
-### Apply Stash
-```bash
-git stash apply
-git stash apply stash@{0}
-git stash pop
-```
-
-### Delete Stash
-```bash
-git stash drop
-git stash drop stash@{0}
-git stash clear
-```
-
----
-
-## 8. REMOTE OPERATIONS
+## ── REMOTE ──
 
 ### View Remote
 ```bash
+# List remote connections
 git remote
+
+# List remote connections with URLs
 git remote -v
+
+# Show detailed info about a remote
 git remote show origin
 ```
 
-### Add Remote
+### Manage Remote
 ```bash
-git remote add origin <repository-url>
-```
+# Add a remote named origin
+git remote add origin https://github.com/user/repo.git
 
-### Change Remote
-```bash
-git remote set-url origin <new-url>
+# Rename a remote
+git remote rename origin upstream
+
+# Remove a remote
 git remote remove origin
+
+# Change remote URL
+git remote set-url origin https://github.com/user/repo.git
 ```
 
-### Fetch
+### Fetch, Pull & Push
 ```bash
-git fetch
+# Download all remote changes (don't merge)
 git fetch origin
+
+# Fetch from all remotes
 git fetch --all
-```
 
-### Pull
-```bash
-git pull
-git pull origin main
-git pull --rebase
-```
+# Fetch + merge remote branch into current
+git pull origin develop
 
-### Push
-```bash
-git push
-git push origin main
-git push origin feature/multiply
-git push -u origin feature/multiply
-git push origin --delete feature/multiply
+# Fetch + rebase (cleaner history)
+git pull --rebase origin develop
+
+# Push a branch to remote
+git push origin feature/login
+
+# Push and set upstream tracking
+git push -u origin feature/login
+
+# Safe force push (won't overwrite others' work)
+git push --force-with-lease origin feature/login
+
+# Push commits + all tags
+git push origin main --tags
+
+# Push multiple branches + tags
+git push origin main develop --tags
 ```
 
 ---
 
-## 9. TAGGING
+## ── MERGE & REBASE ──
 
-### Create Tag
+### Merge
 ```bash
+# Merge branch into current (fast-forward if possible)
+git merge feature/login
+
+# Merge and always create a merge commit
+git merge --no-ff feature/login
+
+# Squash all commits into one before merging
+git merge --squash feature/login
+
+# Abort an in-progress merge
+git merge --abort
+```
+
+### Rebase
+```bash
+# Rebase current branch onto develop
+git rebase develop
+
+# Rebase onto the remote develop
+git rebase origin/develop
+
+# Interactive rebase: edit last 3 commits
+git rebase -i HEAD~3
+
+# Rebase + auto-apply fixup! commits
+git rebase -i --autosquash origin/develop
+
+# Continue after resolving a conflict
+git rebase --continue
+
+# Abort an in-progress rebase
+git rebase --abort
+
+# Skip the current conflicting commit and continue
+git rebase --skip
+```
+
+### Cherry Pick
+```bash
+# Apply a specific commit to current branch
+git cherry-pick a1b2c3d
+
+# Apply a range of commits
+git cherry-pick a1b2c3d..e4f5g6h
+```
+
+---
+
+## ── LOG & HISTORY ──
+
+### View History
+```bash
+# Full commit history
+git log
+
+# Compact one-line log
+git log --oneline
+
+# Visual branch graph (all branches)
+git log --oneline --graph --decorate --all
+
+# Last 10 commits
+git log -10 --oneline
+
+# Show details of a specific commit
+git show a1b2c3d
+
+# Show a file as it was at a specific commit
+git show a1b2c3d:src/app.js
+```
+
+### Search History
+```bash
+# Commits by a specific author
+git log --author="Alice"
+
+# Commits from the last 2 weeks
+git log --since="2 weeks ago"
+
+# Search commits by message keyword
+git log --grep="fix:"
+
+# Commits that touched a specific file
+git log src/app.js
+
+# Commits + diffs for a specific file
+git log -p src/app.js
+
+# Show who changed each line of a file
+git blame src/app.js
+
+# Commit count per author (sorted)
+git shortlog -sn
+```
+
+---
+
+## ── UNDO & RESET ──
+
+### Revert
+```bash
+# Create a new commit that undoes a commit (safe for shared branches)
+git revert a1b2c3d
+
+# Revert a merge commit (m 1 = keep the first parent)
+git revert -m 1 HEAD
+```
+
+### Reset
+```bash
+# Undo last commit, keep changes staged
+git reset --soft HEAD~1
+
+# Undo last commit, keep changes unstaged
+git reset --mixed HEAD~1
+
+# Undo last commit and DISCARD all changes
+git reset --hard HEAD~1
+
+# Reset to remote state
+git reset --hard origin/main
+
+# Go back to state before last merge/rebase
+git reset --hard ORIG_HEAD
+```
+
+### Recover Lost Work
+```bash
+# Show full history including resets (your safety net)
+git reflog
+
+# Show reflog for all branches
+git reflog show --all
+
+# Restore a file from a specific commit
+git checkout a1b2c3d -- src/app.js
+
+# Create a branch from a reflog entry
+git checkout -b recovery a1b2c3d
+```
+
+---
+
+## ── STASH ──
+
+### Save Work Temporarily
+```bash
+# Stash all uncommitted changes
+git stash
+
+# Stash with a description
+git stash push -m "WIP: login form"
+
+# Stash a specific file
+git stash push src/app.js -m "partial api work"
+```
+
+### Manage Stashes
+```bash
+# List all stashes
+git stash list
+
+# Show diff of latest stash
+git stash show -p
+
+# Apply latest stash and remove it from stash list
+git stash pop
+
+# Apply a specific stash (keep it in list)
+git stash apply stash@{2}
+
+# Delete a specific stash
+git stash drop stash@{0}
+
+# Delete ALL stashes
+git stash clear
+
+# Create a branch from a stash
+git stash branch feature/login
+```
+
+---
+
+## ── TAGS ──
+
+### Create Tags
+```bash
+# Create a lightweight tag
 git tag v1.0.0
-git tag -a v1.0.0 -m "Version 1.0.0"
+
+# Create an annotated tag (recommended)
+git tag -a v1.0.0 -m "Release 1.0.0"
+
+# Tag a specific past commit
+git tag -a v1.0.1 a1b2c3d -m "Hotfix"
 ```
 
-### List Tags
+### Manage Tags
 ```bash
+# List all tags
 git tag
+
+# Filter tags by pattern
 git tag -l "v1*"
-```
 
-### View Tag
-```bash
+# Show tag details
 git show v1.0.0
-```
 
-### Delete Tag
-```bash
+# Show the most recent tag reachable from current commit
+git describe --tags
+
+# Delete a local tag
 git tag -d v1.0.0
+
+# Delete a remote tag
 git push origin --delete v1.0.0
+
+# Checkout code at a specific tag (detached HEAD)
+git checkout v1.0.0
 ```
 
 ### Push Tags
 ```bash
+# Push a single tag to remote
 git push origin v1.0.0
+
+# Push ALL tags to remote
 git push origin --tags
 ```
 
 ---
 
-## 10. UNDO & RESET
+## ── GITFLOW ──
 
-### Soft Reset (keep changes staged)
+### Gitflow Workflow
 ```bash
-git reset --soft HEAD~1
-```
+# Initialise GitFlow with default settings
+git flow init -d
 
-### Mixed Reset (unstage changes)
-```bash
-git reset --mixed HEAD~1
-git reset HEAD~1
-```
+# Start a feature branch off develop
+git flow feature start my-feature
 
-### Hard Reset (discard all changes)
-```bash
-git reset --hard HEAD~1
-git reset --hard origin/main
-```
+# Merge feature into develop, delete branch
+git flow feature finish my-feature
 
-### Revert (create new commit undoing changes)
-```bash
-git revert <commit-hash>
-git revert HEAD
-```
+# Push feature branch to remote
+git flow feature publish my-feature
 
----
+# Pull a remote feature branch
+git flow feature pull origin my-feature
 
-## 11. SEARCHING & FINDING
+# Cut a release branch off develop
+git flow release start 1.0.0
 
-### Search Commit Messages
-```bash
-git log --grep="multiply"
-git log --grep="function"
-```
+# Merge release into main + develop, tag it
+git flow release finish 1.0.0
 
-### Search Code
-```bash
-git log -p -S "multiply"
-git log -p --all -S "def multiply"
-```
+# Start a hotfix branch off main
+git flow hotfix start fix-login
 
-### Find Commit
-```bash
-git log --oneline | grep "Add"
-git log --reverse --oneline -5
-```
+# Merge hotfix into main + develop, tag it
+git flow hotfix finish fix-login
 
-### Blame
-```bash
-git blame calc.py
-git blame -L 5,10 calc.py
+# List all feature branches
+git flow feature list
+
+# List all release branches
+git flow release list
 ```
 
 ---
 
-## 12. ADVANCED OPERATIONS
+## ── CONFLICTS ──
 
-### Cherry Pick
+### Handle Merge Conflicts
 ```bash
-git cherry-pick <commit-hash>
-git cherry-pick feature/multiply
+# See which files have conflicts
+git status
+
+# Show only conflicted files
+git diff --diff-filter=U
+
+# List all unresolved files (names only)
+git diff --name-only --diff-filter=U
+
+# Open the configured visual merge tool
+git mergetool
+
+# Mark a conflict as resolved
+git add src/app.js
+
+# Keep YOUR version of a conflicted file
+git checkout --ours src/app.js
+
+# Keep THEIR version of a conflicted file
+git checkout --theirs src/app.js
+
+# Show commits that caused the conflict
+git log --merge --oneline
+
+# Abort merge and return to pre-merge state
+git merge --abort
+
+# Abort rebase and return to pre-rebase state
+git rebase --abort
 ```
 
-### Squash Commits
+---
+
+## ── INSPECT & SEARCH ──
+
+### Search & Inspect
 ```bash
-git rebase -i HEAD~3
-# Mark commit as 'squash' or 's'
+# Search for a string in tracked files
+git grep "TODO" src/
+
+# Search with line numbers
+git grep -n "function addTask"
+
+# Find commits that added/removed a string (pickaxe)
+git log -S "addTask" --oneline
+
+# List all tracked files
+git ls-files
+
+# List all untracked files
+git ls-files --others --exclude-standard
+
+# Show repo size and object count
+git count-objects -vH
 ```
 
-### Create Patch
+### Binary Search for Bugs
 ```bash
-git diff > changes.patch
-git apply changes.patch
-```
-
-### Bisect (Find problematic commit)
-```bash
+# Start binary search to find a bug
 git bisect start
+
+# Mark current commit as bad (has the bug)
 git bisect bad
-git bisect good <commit-hash>
+
+# Mark a known good commit
+git bisect good v0.9.0
+
+# End bisect session and return to HEAD
 git bisect reset
 ```
 
-### Reflog (Recover lost commits)
+---
+
+## ── ADVANCED ──
+
+### Worktrees & Submodules
 ```bash
-git reflog
-git checkout <lost-commit-hash>
+# Check out a second branch without losing current work
+git worktree add ../hotfix main
+
+# List all worktrees
+git worktree list
+
+# Add a submodule
+git submodule add https://github.com/user/lib.git libs/lib
+
+# Clone and initialise all submodules
+git submodule update --init --recursive
+```
+
+### Patches & Bundling
+```bash
+# Create a diff patch file
+git diff > patch.diff
+
+# Apply a diff patch file
+git apply patch.diff
+
+# Export last 3 commits as patch files
+git format-patch HEAD~3
+
+# Email patches to maintainers (mailing list workflow)
+git send-email *.patch
+
+# Bundle entire repo into one file (for offline transfer)
+git bundle create repo.bundle --all
+```
+
+### Maintenance & Verification
+```bash
+# Run garbage collection to optimise the repo
+git gc --aggressive
+
+# Verify integrity of the object database
+git fsck
+
+# Attach a note to a commit
+git notes add -m "reviewed by Alice" a1b2c3d
+
+# Export repo as a zip (no .git folder)
+git archive --format=zip HEAD > release.zip
 ```
 
 ---
 
-## 13. PRACTICAL WORKFLOW EXAMPLES
+## ── GITHUB CLI ──
 
-### Feature Branch Workflow
+### Authenticate & Create
 ```bash
-# Create feature branch
-git checkout -b feature/multiply
+# Authenticate with GitHub
+gh auth login
 
-# Make changes
-# ... edit calc.py, add multiply function ...
+# Create a new GitHub repo
+gh repo create my-app --public
 
-# Stage and commit
-git add calc.py
-git commit -m "Add multiply function"
-
-# Switch to main
-git checkout main
-
-# Merge feature
-git merge feature/multiply
-
-# Delete feature branch
-git branch -d feature/multiply
-
-# Push to remote
-git push origin main
+# Clone a GitHub repo
+gh repo clone user/repo
 ```
 
-### Pull Request Workflow
+### Pull Requests
 ```bash
-# Create branch
-git checkout -b feature/divide
+# Create a new pull request
+gh pr create --base develop --title "feat: login"
 
-# Make changes and commit
-git add calc.py
-git commit -m "Add divide function"
+# List open pull requests
+gh pr list
 
-# Push to remote
-git push -u origin feature/divide
+# View PR details
+gh pr view 42
 
-# Create PR on GitHub/GitLab (via web UI)
+# Check out a PR locally for testing
+gh pr checkout 42
 
-# After approval, merge and delete
-git checkout main
-git pull origin main
-git merge feature/divide
-git push origin main
-git branch -d feature/divide
+# Approve a PR
+gh pr review 42 --approve
+
+# Request changes on a PR
+gh pr review 42 --request-changes -b "Needs tests"
+
+# Merge and delete a PR's branch
+gh pr merge 42 --squash --delete-branch
 ```
 
-### Handling Merge Conflicts
+### Issues & Releases
 ```bash
-# During merge conflict
-git merge feature/multiply
-# CONFLICT occurs
+# Create a GitHub issue
+gh issue create --title "Bug: null user" --body "Steps to reproduce..."
 
-# Check conflicted files
-git status
+# List issues by label
+gh issue list --label "bug"
 
-# View conflicts
-cat calc.py
-
-# Edit calc.py to resolve conflicts
-
-# Stage resolved file
-git add calc.py
-
-# Complete merge
-git commit -m "Resolve merge conflict"
+# Create a GitHub release
+gh release create v1.0.0 --title "v1.0.0" --notes "Initial release"
 ```
 
-### Undo Last Commit (not pushed)
+### Workflows
 ```bash
-git reset --soft HEAD~1
-# Changes are now staged, can edit and recommit
-git add .
-git commit -m "Fixed commit message"
-```
+# Manually trigger a GitHub Actions workflow
+gh workflow run deploy.yml
 
-### Undo Last Pushed Commit
-```bash
-git revert HEAD
-# Creates new commit that undoes changes
-git push origin main
-```
-
-### Sync Fork with Main Repository
-```bash
-git remote add upstream <original-repo-url>
-git fetch upstream
-git checkout main
-git rebase upstream/main
-git push origin main
+# List recent workflow runs
+gh run list
 ```
 
 ---
 
-## 14. USEFUL SHORTCUTS & ALIASES
-
-### Create Aliases
-```bash
-git config --global alias.st status
-git config --global alias.co checkout
-git config --global alias.br branch
-git config --global alias.ci commit
-git config --global alias.log1 "log --oneline -5"
-git config --global alias.unstage "restore --staged"
-git config --global alias.undo "reset --soft HEAD~1"
-```
-
-### Use Aliases
-```bash
-git st
-git co main
-git br
-git ci -m "message"
-```
-
----
-
-## 15. QUICK REFERENCE CHEAT SHEET
+## ── QUICK REFERENCE CHEAT SHEET ──
 
 | Command | Description |
 |---------|-------------|
@@ -495,13 +740,19 @@ git ci -m "message"
 | `git log --oneline` | View compact history |
 | `git diff` | Show unstaged changes |
 | `git reset --hard HEAD~1` | Undo last commit |
+| `git stash` | Save work temporarily |
+| `git rebase main` | Rebase onto main |
+| `git tag v1.0.0` | Create a tag |
+| `git remote -v` | List remotes |
+| `git reflog` | Show complete history |
 
 ---
 
 ## Tips
 - Always `git pull` before starting new work
-- Use descriptive commit messages
+- Use descriptive commit messages (feat:, fix:, docs:, etc.)
 - Commit frequently with logical groupings
-- Use branches for new features
+- Use branches for new features (feature/name)
 - Review changes before committing: `git diff`
 - Don't force push unless necessary: `git push --force-with-lease`
+- Pull with rebase for cleaner history: `git pull --rebase`
